@@ -47,10 +47,6 @@ namespace InGameDefEditor
 							if (!Defs.ApplyStatsAutoDefs.AddDef(s))
 								Log.Warning($"unable to auto-apply stats to {s} as the def was not found");
 						});
-						raad?.autoApplyBackstories.ForEach(s => {
-							if (!Defs.ApplyStatsAutoDefs.AddBackstory(s))
-								Log.Warning($"unable to auto-apply stats to {s} as the backstory was not found");
-						});
 					}
 
 					if (Load(DefType.Apparel, out RootApparel ra))
@@ -123,14 +119,7 @@ namespace InGameDefEditor
 							else
 								sb.AppendLine($"- {s}");
 						});
-						rdd?.disabledBackstories.ForEach(s => {
-							if (!Defs.DisabledDefs.AddBackstory(s))
-								Log.Warning($"failed to disable def {s} as the def was not found");
-							else
-								sb.AppendLine($"- {s}");
-						});
 
-						Defs.DisabledDefs.Backstories.ForEach(b => DatabaseUtil.Remove(b));
 						Defs.DisabledDefs.Defs.ForEach(d => DatabaseUtil.Remove(d));
 					}
 
@@ -152,12 +141,9 @@ namespace InGameDefEditor
         {
 			try
 			{
-				var dBackstories = new List<string>();
-				Defs.DisabledDefs.Backstories.ForEach(b => dBackstories.Add(b.identifier));
 				var dDefs = new List<string>();
 				Defs.DisabledDefs.Defs.ForEach(d => dDefs.Add(d.defName));
 				Save("DisabledDefs", new RootDisabledDefs() { 
-					disabledBackstories = dBackstories,
 					disabledDefsV2 = dDefs
 				});
 			}
@@ -168,12 +154,9 @@ namespace InGameDefEditor
 
 			try
 			{
-				var aaBackstories = new List<string>();
-				Defs.ApplyStatsAutoDefs.Backstories.ForEach(b => aaBackstories.Add(b.identifier));
 				var aaDefs = new List<string>();
 				Defs.ApplyStatsAutoDefs.Defs.ForEach(d => aaDefs.Add(d.defName));
 				Save("AutoApplyDefs", new RootAutoApplyDefs() {
-					autoApplyBackstories = aaBackstories,
 					autoApplyDefsV2 = aaDefs
 				});
 			}
@@ -292,7 +275,7 @@ namespace InGameDefEditor
 
             try
             {
-                Save(DefType.Backstory, new RootBackstory() { stats = GetChangedBackstory(Defs.Backstories.Values) });
+                Save(DefType.Backstory, new RootBackstory() { stats = GetChangedDefs(Defs.BackstoryDefs.Values, (d) => new BackstoryDefStats(d)) });
             }
             catch (Exception e)
             {
@@ -343,19 +326,6 @@ namespace InGameDefEditor
 			{
 				Log.Error("Problem saving " + DefType.PawnKind + ".\n" + e.GetType().Name + "\n" + e.Message);
 			}
-		}
-
-		private static List<BackstoryStats> GetChangedBackstory(IEnumerable<Backstory> backstories)
-		{
-			List<BackstoryStats> result = new List<BackstoryStats>(backstories.Count());
-			foreach (var b in backstories)
-			{
-				if (Defs.ApplyStatsAutoDefs.ContainsBackstory(b))
-				{
-					result.Add(new BackstoryStats(b));
-				}
-			}
-			return result;
 		}
 
 		private static List<S> GetChangedDefs<D, S>(IEnumerable<D> defs, Func<D, S> newInstance) where D : Def, new() where S : IDefStat
@@ -463,37 +433,6 @@ namespace InGameDefEditor
 					fs.Close();
 			}
 			return true;
-		}
-
-		private static void Initialize(BackstoryStats b, StringBuilder sb)
-		{
-			if (b != null)
-			{
-				try
-				{
-					if (b.Initialize() &&
-						Defs.ApplyStatsAutoDefs.Contains(b.Backstory))
-					{
-						try
-						{
-							b.ApplyStats(b.Backstory);
-							sb.AppendLine($"- Backstory: {b.Backstory.identifier}");
-						}
-						catch (Exception e)
-						{
-							Log.Error("Failed to apply settings to Backstory [" + b.identifier + "] due to " + e.Message);
-						}
-					}
-					else
-					{
-						Log.Warning("Unable to initialize Backstory " + b.identifier);
-					}
-				}
-				catch (Exception e)
-				{
-					Log.Error("Failed to load Backstory [" + b.identifier + "] due to " + e.Message);
-				}
-			}
 		}
 
 		private static void Initialize<D>(DefStat<D> s, StringBuilder sb) where D : Def, new()

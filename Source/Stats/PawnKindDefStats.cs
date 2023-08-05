@@ -60,8 +60,6 @@ namespace InGameDefEditor.Stats
 
 		public bool isGoodBreacher;
 
-		public float baseRecruitDifficulty = 0.5f;
-
 		public bool aiAvoidCover;
 
 		public FloatRange fleeHealthThresholdRange;
@@ -170,7 +168,6 @@ namespace InGameDefEditor.Stats
 			this.canArriveManhunter = d.canArriveManhunter;
 			this.canBeSapper = d.canBeSapper;
 			this.isGoodBreacher = d.isGoodBreacher;
-			this.baseRecruitDifficulty = d.baseRecruitDifficulty;
 			this.aiAvoidCover = d.aiAvoidCover;
 			this.fleeHealthThresholdRange = new FloatRange(d.fleeHealthThresholdRange.min, d.fleeHealthThresholdRange.max);
 			this.acceptArrestChanceFactor =  d.acceptArrestChanceFactor;
@@ -320,7 +317,6 @@ namespace InGameDefEditor.Stats
 				d.canArriveManhunter = this.canArriveManhunter;
 				d.canBeSapper = this.canBeSapper;
 				d.isGoodBreacher = this.isGoodBreacher;
-				d.baseRecruitDifficulty = this.baseRecruitDifficulty;
 				d.aiAvoidCover = this.aiAvoidCover;
 				d.fleeHealthThresholdRange = new FloatRange(this.fleeHealthThresholdRange.min, this.fleeHealthThresholdRange.max);
 				d.acceptArrestChanceFactor = this.acceptArrestChanceFactor;

@@ -50,7 +50,7 @@ namespace InGameDefEditor.Stats.Misc
 		public float bed_maxBodySize;
 		public bool bed_caravansCanUse;
 		public float nutritionCostPerDispense;
-		public float turretBurstWarmupTime;
+		public FloatRange turretBurstWarmupTime;
 		public float turretBurstCooldownTime;
 		public float turretTopDrawSize;
 		public Vector2Stats turretTopOffset;

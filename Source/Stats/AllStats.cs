@@ -10,7 +10,6 @@ namespace InGameDefEditor.Stats
 	{
 		public List<string> disabledThingDefs;
 		public List<string> disabledDefsV2;
-		public List<string> disabledBackstories;
 	}
 
 	[XmlRoot("IGDE", Namespace = "http://www.InGameDefEditor.kiamev.com", IsNullable = false)]
@@ -18,7 +17,6 @@ namespace InGameDefEditor.Stats
 	{
 		public List<string> autoApplyDefs;
 		public List<string> autoApplyDefsV2;
-		public List<string> autoApplyBackstories;
 	}
 
 	[XmlRoot("IGDE", Namespace = "http://www.InGameDefEditor.kiamev.com", IsNullable = false)]
@@ -90,7 +88,7 @@ namespace InGameDefEditor.Stats
 	[XmlRoot("IGDE", Namespace = "http://www.InGameDefEditor.kiamev.com", IsNullable = false)]
 	public class RootBackstory
 	{
-		public List<BackstoryStats> stats;
+		public List<BackstoryDefStats> stats;
 	}
 
 	[XmlRoot("IGDE", Namespace = "http://www.InGameDefEditor.kiamev.com", IsNullable = false)]

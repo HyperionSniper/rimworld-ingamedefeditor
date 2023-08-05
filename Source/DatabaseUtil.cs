@@ -9,13 +9,6 @@ namespace InGameDefEditor
 {
     class DatabaseUtil
     {
-        private static readonly FieldInfo shuffleableBackstoryListFI = typeof(BackstoryDatabase).GetField("shuffleableBackstoryList", BindingFlags.Static | BindingFlags.NonPublic);
-
-        public static void Add(Backstory b)
-        {
-            BackstoryDatabase.AddBackstory(b);
-        }
-
         public static void Add<D>(D d) where D : Def
         {
             DefDatabase<D>.Add(d);
@@ -25,9 +18,6 @@ namespace InGameDefEditor
         {
             switch (o)
             {
-                case Backstory b:
-                    Add(b);
-                    return true;
                 case Def d:
                     Add(d);
                     return true;
@@ -57,11 +47,8 @@ namespace InGameDefEditor
                 return true;
             if (TryGetFromDB<TraitDef>(s, out o))
                 return true;
-            if (BackstoryDatabase.TryGetWithIdentifier(s, out Backstory b, false))
-            {
-                o = b;
+            if (TryGetFromDB<BackstoryDef>(s, out o))
                 return true;
-            }
 
             return false;
         }
@@ -75,7 +62,7 @@ namespace InGameDefEditor
                         return TryGetDefTypeFor(obj, out dt);
                     dt = DefType.Apparel;
                     return false;
-                case Backstory _:
+                case BackstoryDef _:
                     dt = DefType.Backstory;
                     return true;
                 case BiomeDef _:
@@ -165,20 +152,6 @@ namespace InGameDefEditor
             return o != null;
         }
 
-        public static void Remove(Backstory b)
-        {
-            BackstoryDatabase.allBackstories.Remove(b.identifier);
-            if (shuffleableBackstoryListFI.GetValue(null) is Dictionary<Pair<BackstorySlot, BackstoryCategoryFilter>, List<Backstory>> dic)
-            {
-                Log.Message("Cleared BackstoryDatabase.shuffleableBackstoryList");
-                dic.Clear();
-            }
-            else
-            {
-                Log.Warning("Failed to clear BackstoryDatabase.shuffleableBackstoryList");
-            }
-        }
-
         public static void Remove(Def d)
         {
             MethodInfo methodMI = null;
@@ -205,6 +178,9 @@ namespace InGameDefEditor
                 case TraitDef _:
                     methodMI = typeof(DefDatabase<TraitDef>).GetMethod("Remove", BindingFlags.Static | BindingFlags.NonPublic);
                     break;
+                case BackstoryDef _:
+                    methodMI = typeof(DefDatabase<BackstoryDef>).GetMethod("Remove", BindingFlags.Static | BindingFlags.NonPublic);
+                    break;
                 case ThingDef _:
                     methodMI = typeof(DefDatabase<ThingDef>).GetMethod("Remove", BindingFlags.Static | BindingFlags.NonPublic);
                     break;
@@ -219,9 +195,6 @@ namespace InGameDefEditor
         {
             switch (o)
             {
-                case Backstory b:
-                    Remove(b);
-                    return true;
                 case Def d:
                     Remove(d);
                     return true;
@@ -239,16 +212,6 @@ namespace InGameDefEditor
             if (d != null)
             {
                 Remove(d);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool RemoveBackstory(string identifier)
-        {
-            if (BackstoryDatabase.TryGetWithIdentifier(identifier, out Backstory b, false))
-            {
-                Remove(b);
                 return true;
             }
             return false;

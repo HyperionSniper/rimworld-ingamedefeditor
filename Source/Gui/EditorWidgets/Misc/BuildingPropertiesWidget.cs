@@ -79,7 +79,9 @@ namespace InGameDefEditor.Gui.EditorWidgets.Misc
             // TODO this.inputWidgets.Add(new BoolInputWidget<BuildingProperties>(this.props, "Work Speed Penalty Outdoors", p => p.workSpeedPenaltyOutdoors, (p, v) => p.workSpeedPenaltyOutdoors = v));
             // TODO this.inputWidgets.Add(new BoolInputWidget<BuildingProperties>(this.props, "Work Speed Penalty Temperature", p => p.workSpeedPenaltyTemperature, (p, v) => p.workSpeedPenaltyTemperature = v));
             this.inputWidgets.Add(new IntInputWidget<BuildingProperties>(this.props, "Watch Building Stand Rect Width", p => p.watchBuildingStandRectWidth, (p, v) => p.watchBuildingStandRectWidth = v));
-			this.inputWidgets.Add(new FloatInputWidget<BuildingProperties>(this.props, "Turret - Burst Warmup Time", p => p.turretBurstWarmupTime, (p, v) => p.turretBurstWarmupTime = v));
+			this.inputWidgets.Add(new MinMaxInputWidget<BuildingProperties, float>("Turret - Burst Warmup Time",
+				new FloatInputWidget<BuildingProperties>(this.props, "Min", p => p.turretBurstWarmupTime.min, (p, v) => p.turretBurstWarmupTime.min = v),
+				new FloatInputWidget<BuildingProperties>(this.props, "Max", p => p.turretBurstWarmupTime.max, (p, v) => p.turretBurstWarmupTime.max = v)));
 			this.inputWidgets.Add(new FloatInputWidget<BuildingProperties>(this.props, "Turret - Burst Cooldown Time", p => p.turretBurstCooldownTime, (p, v) => p.turretBurstCooldownTime = v));
 			this.inputWidgets.Add(new FloatInputWidget<BuildingProperties>(this.props, "Turret - Top Draw Size", p => p.turretTopDrawSize, (p, v) => p.turretTopDrawSize = v));
 			this.inputWidgets.Add(new MinMaxInputWidget<BuildingProperties, float>("Turret - Top Offset",

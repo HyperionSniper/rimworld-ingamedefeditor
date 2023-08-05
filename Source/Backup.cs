@@ -10,7 +10,6 @@ namespace InGameDefEditor
     class Backup
     {
         private static bool initialized = false;
-		private readonly static Dictionary<string, BackstoryStats> backupBackstories = new Dictionary<string, BackstoryStats>();
         private readonly static Dictionary<string, IParentStat> backupDefs = new Dictionary<string, IParentStat>();
 
         public static bool HasChanged<T>(object o)
@@ -19,8 +18,6 @@ namespace InGameDefEditor
             {
                 case IDefStat ds:
                     return Defs.ApplyStatsAutoDefs.Contains(ds.BaseDef);
-                case BackstoryStats bs:
-                    return Defs.ApplyStatsAutoDefs.ContainsBackstory(bs.Backstory);
             }
             Log.Warning($"Unable to determine if {Util.GetLabel(o)} should be auto-applied");
             return false;
@@ -201,16 +198,16 @@ namespace InGameDefEditor
                     }
                 }
 
-				foreach (Backstory b in Defs.Backstories.Values)
+				foreach (BackstoryDef d in Defs.BackstoryDefs.Values)
                 {
                     try
                     {
-                        backupBackstories[b.identifier] = new BackstoryStats(b);
+                        backupDefs[d.defName] = new BackstoryDefStats(d);
                     }
                     catch (Exception e)
                     {
-                        if (b != null)
-                            Log.Warning("Failed to initialize backup for " + b.identifier + ". " + e.Message);
+                        if (d != null)
+                            Log.Warning("Failed to initialize backup for " + d.identifier + ". " + e.Message);
                     }
                 }
 
@@ -281,17 +278,6 @@ namespace InGameDefEditor
             }
         }
 
-        public static bool ApplyStats(Backstory b)
-        {
-            if (backupBackstories.TryGetValue(b.identifier, out BackstoryStats s))
-            {
-                s.ApplyStats(b);
-                return true;
-            }
-            Log.Warning("Unable to find backup for Backstory " + b.identifier);
-            return false;
-		}
-
 		public static bool ApplyStats(Def def)
 		{
 			string key = def.defName;
@@ -308,8 +294,6 @@ namespace InGameDefEditor
         {
             switch(o)
             {
-                case Backstory b:
-                    return ApplyStats(b);
                 case Def d:
                     return ApplyStats(d);
             }

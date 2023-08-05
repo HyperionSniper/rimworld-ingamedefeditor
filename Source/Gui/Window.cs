@@ -69,8 +69,6 @@ namespace InGameDefEditor
 						{
 							if (i is Def def)
 								this.CreateSelected(def, selectedDefType.Type);
-							else if (i is Backstory b)
-								this.CreateSelected(b, selectedDefType.Type);
 						}
 					});
 				}
@@ -186,8 +184,6 @@ namespace InGameDefEditor
 		{
 			if (o is Def def)
 				return Util.GetLabel(def);
-			else if (o is Backstory b)
-				return b.title;
 			return o.ToString();
 		}
 
@@ -202,8 +198,6 @@ namespace InGameDefEditor
 						selectedDefType = i;
 						if (p.Second is Def def)
 							this.CreateSelected(def, selectedDefType.Type);
-						else if (p.Second is Backstory b)
-							this.CreateSelected(b, selectedDefType.Type);
 						break;
 					}
 				}
@@ -231,13 +225,6 @@ namespace InGameDefEditor
         {
             base.PostClose();
             IOUtil.SaveData();
-		}
-
-		private void CreateSelected(Backstory b, DefType type)
-		{
-			selectedDef = new BackstoryWidget(b, type);
-			this.ResetScrolls();
-			IngredientCountWidget.ResetUniqueId();
 		}
 
 		private void CreateSelected(Def d, DefType type)
@@ -316,41 +303,6 @@ namespace InGameDefEditor
 			void ResetTypeDefs();
 		}
 
-		private struct EditableBackstoryType : IEditableDefType
-		{
-			private readonly string label;
-			public readonly DefType type;
-			public readonly IEnumerable<Backstory> items;
-
-			public string Label => this.label;
-			public DefType Type => this.type;
-
-			public EditableBackstoryType(string label, DefType type, IEnumerable<Backstory> items)
-			{
-				this.label = label;
-				this.type = type;
-				this.items = items;
-			}
-
-			public IEnumerable<object> GetDefs()
-			{
-				List<object> l = new List<object>(this.items.Count());
-				foreach (var b in this.items)
-					l.Add(b);
-				return l;
-			}
-
-			public void ResetTypeDefs()
-			{
-				foreach (var v in this.items)
-				{
-					Backup.ApplyStats(v);
-					Defs.ApplyStatsAutoDefs.Remove(v);
-					Defs.DisabledDefs.Remove(v);
-				}
-			}
-		}
-
 		private struct EditableDefType<D> : IEditableDefType where D : Def, new()
 		{
 			private readonly string label;
@@ -392,7 +344,7 @@ namespace InGameDefEditor
 			{
 				//new EditableDefType<ThingDef>("Animals", DefType.Animal, Defs.AnimalDefs.Values),
 				new EditableDefType<ThingDef>("Apparel", DefType.Apparel, Defs.ApparelDefs.Values),
-				new EditableBackstoryType("Backstories", DefType.Backstory, Defs.Backstories.Values),
+				new EditableDefType<BackstoryDef>("Backstories", DefType.Backstory, Defs.BackstoryDefs.Values),
 				new EditableDefType<BiomeDef>("Biomes", DefType.Biome, Defs.BiomeDefs.Values),
 				new EditableDefType<ThingDef>("Buildings", DefType.Building, Defs.BuildingDefs.Values),
 				new EditableDefType<DifficultyDef>("Difficulty", DefType.Difficulty, Defs.DifficultyDefs.Values),// this.SortDifficultyOptions(Defs.DifficultyDefs.Values)),

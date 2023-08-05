@@ -7,7 +7,6 @@ namespace InGameDefEditor
 {
     class DefsDictionary
     {
-        private readonly SortedDictionary<string, Backstory> backstories = new SortedDictionary<string, Backstory>();
         private readonly SortedDictionary<string, Def> defs = new SortedDictionary<string, Def>();
 
         public IEnumerable<Pair<string, object>> All
@@ -15,8 +14,6 @@ namespace InGameDefEditor
             get
             {
                 List<Pair<string, object>> l = new List<Pair<string, object>>();
-                foreach (var kv in backstories)
-                    l.Add(new Pair<string, object>(kv.Key, kv.Value));
                 foreach (var kv in defs)
                     l.Add(new Pair<string, object>(kv.Key, kv.Value));
                 return l;
@@ -28,20 +25,18 @@ namespace InGameDefEditor
             get
             {
                 List<string> l = new List<string>();
-                l.AddRange(backstories.Keys);
                 l.AddRange(defs.Keys);
                 return l;
             }
         }
 
-        public List<Backstory> Backstories => backstories.Values.ToList();
         public List<Def> Defs => defs.Values.ToList();
 
         public int Count
         {
             get
             {
-                return backstories.Count + defs.Count;
+                return defs.Count;
             }
         }
 
@@ -49,9 +44,6 @@ namespace InGameDefEditor
         {
             switch (o)
             {
-                case Backstory b:
-                    backstories[b.identifier] = b;
-                    return true;
                 case Def d:
                     defs[d.defName] = d;
                     return true;
@@ -73,34 +65,9 @@ namespace InGameDefEditor
             return false;
         }
 
-        public bool AddBackstory(string identifier)
-        {
-            if (BackstoryDatabase.TryGetWithIdentifier(identifier, out Backstory b, false))
-            {
-                backstories[b.identifier] = b;
-                return true;
-            }
-            return false;
-        }
-
-        public void Add(Backstory b)
-        {
-            this.backstories[b.identifier] = b;
-        }
-
         public void Add(Def def)
         {
             this.defs[def.defName] = def;
-        }
-
-        public bool ContainsBackstory(string identifier)
-        {
-            return backstories.ContainsKey(identifier);
-        }
-
-        public bool ContainsBackstory(Backstory b)
-        {
-            return backstories.ContainsKey(b.identifier);
         }
 
         public bool ContainsDef(string defName)
@@ -117,8 +84,6 @@ namespace InGameDefEditor
         {
             switch (o)
             {
-                case Backstory b:
-                    return backstories.ContainsKey(b.identifier);
                 case Def d:
                     return defs.ContainsKey(d.defName);
             }
@@ -129,8 +94,6 @@ namespace InGameDefEditor
         {
             switch (o)
             {
-                case Backstory b:
-                    return backstories.Remove(b.identifier);
                 case Def d:
                     return defs.Remove(d.defName);
                 case string s:
@@ -143,7 +106,6 @@ namespace InGameDefEditor
 
         internal void Clear()
         {
-            backstories.Clear();
             defs.Clear();
         }
         /*

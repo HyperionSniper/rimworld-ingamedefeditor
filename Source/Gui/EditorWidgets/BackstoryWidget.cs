@@ -13,9 +13,8 @@ using UnityEngine;
 
 namespace InGameDefEditor.Gui.EditorWidgets
 {
-	class BackstoryWidget : AParentDefStatWidget<Backstory>
+	class BackstoryWidget : AParentDefStatWidget<BackstoryDef>
 	{
-		private readonly Backstory Backstory;
 		private readonly DefType type;
 		private readonly List<IInputWidget> inputWidgets;
 
@@ -26,34 +25,37 @@ namespace InGameDefEditor.Gui.EditorWidgets
 		private List<IntInputWidget<Dictionary<SkillDef, int>>> skillGains;
 		private PlusMinusArgs<SkillDef> skillGainsPlusMinus;
 
-		private List<IntInputWidget<TraitEntry>> forcedTraits;
+		private List<IntInputWidget<BackstoryTrait>> forcedTraits;
 		private PlusMinusArgs<TraitDef> forcedTraitsPlusMinus;
 
-		private List<IntInputWidget<TraitEntry>> disallowedTraits;
+		private List<IntInputWidget<BackstoryTrait>> disallowedTraits;
 		private PlusMinusArgs<TraitDef> disallowedTraitsPlusMinus;
+
+		private List<IntInputWidget<BackstoryThingDefCountClass>> possessions;
+		private PlusMinusArgs<TraitDef> possessionsPlusMinus;
 
 		//public List<string> spawnCategories = new List<string>();
 
-		public override string DisplayLabel => this.Backstory.title;
+		public override string DisplayLabel => base.Def.title;
 
-		public BackstoryWidget(Backstory backstory, DefType type) : base(backstory, type)
+		public BackstoryWidget(BackstoryDef backstory, DefType type) : base(backstory, type)
 		{
-			if (backstory.skillGainsResolved == null)
-				backstory.skillGainsResolved = new Dictionary<SkillDef, int>();
+			if (backstory.skillGains == null)
+				backstory.skillGains = new Dictionary<SkillDef, int>();
 			if (backstory.forcedTraits == null)
-				backstory.forcedTraits = new List<TraitEntry>();
+				backstory.forcedTraits = new List<BackstoryTrait>();
 			if (backstory.disallowedTraits == null)
-				backstory.disallowedTraits = new List<TraitEntry>();
+				backstory.disallowedTraits = new List<BackstoryTrait>();
 
-			this.Backstory = backstory;
 			this.type = type;
 			this.inputWidgets = new List<IInputWidget>()
 			{
-				new BoolInputWidget<Backstory>(this.Backstory, "Shuffleable", b => b.shuffleable, (b, v) => b.shuffleable = v),
-				new EnumInputWidget<Backstory, BackstorySlot>(this.Backstory, "Slot", 200, b => b.slot, (b, v) => b.slot = v),
-				new DefInputWidget<Backstory, BodyTypeDef>(this.Backstory, "Body Type Global", 200, b => BackstoryStats.GetBodyTypeGlobal(b), (b, v) => BackstoryStats.SetBodyTypeGlobal(b, v), true),
-				new DefInputWidget<Backstory, BodyTypeDef>(this.Backstory, "Body Type Male", 200, b => BackstoryStats.GetBodyTypeMale(b), (b, v) => BackstoryStats.SetBodyTypeMale(b, v), true, d => d == BodyTypeDefOf.Female),
-				new DefInputWidget<Backstory, BodyTypeDef>(this.Backstory, "Body Type Female", 200, b => BackstoryStats.GetBodyTypeFemale(b), (b, v) => BackstoryStats.SetBodyTypeFemale(b, v), true, d => d == BodyTypeDefOf.Male),
+				new BoolInputWidget<BackstoryDef>(base.Def, "Shuffleable", b => b.shuffleable, (b, v) => b.shuffleable = v),
+				new EnumInputWidget<BackstoryDef, BackstorySlot>(base.Def, "Slot", 200, b => b.slot, (b, v) => b.slot = v),
+				new DefInputWidget<BackstoryDef, BodyTypeDef>(base.Def, "Body Type Global", 200, b => b.bodyTypeGlobal, (b, v) => b.bodyTypeGlobal = v, true),
+				new DefInputWidget<BackstoryDef, BodyTypeDef>(base.Def, "Body Type Male", 200, b =>  b.bodyTypeMale, (b, v) => b.bodyTypeMale = v, true, d => d == BodyTypeDefOf.Female),
+				new DefInputWidget<BackstoryDef, BodyTypeDef>(base.Def, "Body Type Female", 200, b =>  b.bodyTypeFemale, (b, v) => b.bodyTypeFemale = v, true, d => d == BodyTypeDefOf.Male),
+				new DefInputWidget<BackstoryDef, RulePackDef>(base.Def, "Name Maker", 200, b => b.nameMaker, (b, v) => b.nameMaker = v, true),
 			};
 
 			var dic = new SortedDictionary<string, WorkTags>();
@@ -66,33 +68,33 @@ namespace InGameDefEditor.Gui.EditorWidgets
 			this.workDisables = new PlusMinusArgs<WorkTags>()
 			{
 				allItems = this.workTags,
-				isBeingUsed = v => (this.Backstory.workDisables & v) == v,
-				onAdd = v => this.Backstory.workDisables |= v,
-				onRemove = v => this.Backstory.workDisables &= ~v,
+				isBeingUsed = v => (base.Def.workDisables & v) == v,
+				onAdd = v => base.Def.workDisables |= v,
+				onRemove = v => base.Def.workDisables &= ~v,
 				getDisplayName = v => v.ToString()
 			};
 
 			this.requiredWorkTags = new PlusMinusArgs<WorkTags>()
 			{
 				allItems = this.workTags,
-				isBeingUsed = v => (this.Backstory.requiredWorkTags & v) == v,
-				onAdd = v => this.Backstory.requiredWorkTags |= v,
-				onRemove = v => this.Backstory.requiredWorkTags &= ~v,
+				isBeingUsed = v => (base.Def.requiredWorkTags & v) == v,
+				onAdd = v => base.Def.requiredWorkTags |= v,
+				onRemove = v => base.Def.requiredWorkTags &= ~v,
 				getDisplayName = v => v.ToString()
 			};
 
 			this.skillGainsPlusMinus = new PlusMinusArgs<SkillDef>()
 			{
 				allItems = Util.SortedDefList<SkillDef>(),
-				beingUsed = () => this.Backstory.skillGainsResolved.Keys,
+				beingUsed = () => base.Def.skillGains.Keys,
 				onAdd = v =>
 				{
-					this.Backstory.skillGainsResolved[v] = 0;
+					base.Def.skillGains[v] = 0;
 					this.skillGains.Add(this.CreateSkillGainsInput(v));
 				},
 				onRemove = v =>
 				{
-					this.Backstory.skillGainsResolved.Remove(v);
+					base.Def.skillGains.Remove(v);
 					for (int i = 0; i < this.skillGains.Count; ++i)
 						if (this.skillGains[i].DisplayLabel == Util.GetLabel(v))
 						{
@@ -106,12 +108,12 @@ namespace InGameDefEditor.Gui.EditorWidgets
 			this.forcedTraitsPlusMinus = new PlusMinusArgs<TraitDef>()
 			{
 				allItems = Util.SortedDefList<TraitDef>(),
-				beingUsed = () => Util.ConvertItems(this.Backstory.forcedTraits, v => v.def),
+				beingUsed = () => Util.ConvertItems(base.Def.forcedTraits, v => v.def),
 				onAdd = v =>
 				{
-					TraitEntry te = new TraitEntry(v, 0);
-					this.Backstory.forcedTraits.Add(te);
-					this.forcedTraits.Add(this.CreateTraitEntryInput(te));
+					BackstoryTrait te = new BackstoryTrait { def = v, degree = 0 };
+					base.Def.forcedTraits.Add(te);
+					this.forcedTraits.Add(this.CreateBackstoryTraitInput(te));
 					this.RemoveDisallowedTraits(v);
 				},
 				onRemove = v =>
@@ -124,12 +126,12 @@ namespace InGameDefEditor.Gui.EditorWidgets
 			this.disallowedTraitsPlusMinus = new PlusMinusArgs<TraitDef>()
 			{
 				allItems = Util.SortedDefList<TraitDef>(),
-				beingUsed = () => Util.ConvertItems(this.Backstory.disallowedTraits, v => v.def),
+				beingUsed = () => Util.ConvertItems(base.Def.disallowedTraits, v => v.def),
 				onAdd = v =>
 				{
-					TraitEntry te = new TraitEntry(v, 0);
-					this.Backstory.disallowedTraits.Add(te);
-					this.disallowedTraits.Add(this.CreateTraitEntryInput(te));
+					BackstoryTrait te = new BackstoryTrait { def = v, degree = 0 };
+					base.Def.disallowedTraits.Add(te);
+					this.disallowedTraits.Add(this.CreateBackstoryTraitInput(te));
 					this.RemoveForcedTraits(v);
 				},
 				onRemove = v =>
@@ -144,7 +146,7 @@ namespace InGameDefEditor.Gui.EditorWidgets
 
 		public void DisableAutoDeploy()
 		{
-			Defs.ApplyStatsAutoDefs.Remove(this.Backstory.identifier);
+			Defs.ApplyStatsAutoDefs.Remove(base.Def.identifier);
 		}
 
 		public override void DrawLeft(float x, ref float y, float width)
@@ -160,11 +162,11 @@ namespace InGameDefEditor.Gui.EditorWidgets
 				v.Draw(x, ref y, width);
 
 			PlusMinusLabel(x, ref y, width, "Required Work Tags", this.requiredWorkTags);
-			WindowUtil.DrawFlagList(x, ref y, width, workTags, (int)this.Backstory.requiredWorkTags, v => v == WorkTags.None);
+			WindowUtil.DrawFlagList(x, ref y, width, workTags, (int)base.Def.requiredWorkTags, v => v == WorkTags.None);
 
 			y += 10;
 			PlusMinusLabel(x, ref y, width, "Disabled Work Tags", this.workDisables);
-			WindowUtil.DrawFlagList(x, ref y, width, workTags, (int)this.Backstory.workDisables, v => v == WorkTags.None);
+			WindowUtil.DrawFlagList(x, ref y, width, workTags, (int)base.Def.workDisables, v => v == WorkTags.None);
 
 			y += 10;
 			PlusMinusLabel(x, ref y, width, "Forced Traits", this.forcedTraitsPlusMinus);
@@ -180,7 +182,7 @@ namespace InGameDefEditor.Gui.EditorWidgets
 		public override void DrawRight(float x, ref float y, float width)
 		{
 			DrawLabel(x, ref y, width, "Spawn Categories", 30f, true);
-			foreach (var v in this.Backstory.spawnCategories)
+			foreach (var v in base.Def.spawnCategories)
 				DrawLabel(10, ref y, width - 10, "- " + v);
 		}
 
@@ -199,44 +201,44 @@ namespace InGameDefEditor.Gui.EditorWidgets
 			if (this.skillGains == null)
 				this.skillGains = new List<IntInputWidget<Dictionary<SkillDef, int>>>();
 			this.skillGains.Clear();
-			foreach (KeyValuePair<SkillDef, int> kv in this.Backstory.skillGainsResolved)
+			foreach (KeyValuePair<SkillDef, int> kv in base.Def.skillGains)
 				this.skillGains.Add(this.CreateSkillGainsInput(kv.Key));
 
 			if (this.forcedTraits != null)
 				this.forcedTraits.Clear();
-			Util.Populate(out this.forcedTraits, this.Backstory.forcedTraits, te => this.CreateTraitEntryInput(te));
+			Util.Populate(out this.forcedTraits, base.Def.forcedTraits, te => this.CreateBackstoryTraitInput(te));
 
 			if (this.disallowedTraits != null)
 				this.disallowedTraits.Clear();
-			Util.Populate(out this.disallowedTraits, this.Backstory.disallowedTraits, te => this.CreateTraitEntryInput(te));
+			Util.Populate(out this.disallowedTraits, base.Def.disallowedTraits, te => this.CreateBackstoryTraitInput(te));
 		}
 
 		public new void ResetParent()
 		{
 			base.ResetParent();
-			Backup.ApplyStats(this.Backstory);
+			Backup.ApplyStats(base.Def);
 		}
 
 		private void RemoveForcedTraits(TraitDef td)
 		{
-			this.Backstory.forcedTraits.RemoveAll(d => d.def == td);
+			base.Def.forcedTraits.RemoveAll(d => d.def == td);
 			this.forcedTraits.RemoveAll(d => d.Parent.def == td);
 		}
 
 		private void RemoveDisallowedTraits(TraitDef td)
 		{
-			this.Backstory.disallowedTraits.RemoveAll(d => d.def == td);
+			base.Def.disallowedTraits.RemoveAll(d => d.def == td);
 			this.disallowedTraits.RemoveAll(d => d.Parent.def == td);
 		}
 
 		private IntInputWidget<Dictionary<SkillDef, int>> CreateSkillGainsInput(SkillDef sd)
 		{
-			return new IntInputWidget<Dictionary<SkillDef, int>>(this.Backstory.skillGainsResolved, Util.GetLabel(sd), d => d[sd], (d, i) => d[sd] = i);
+			return new IntInputWidget<Dictionary<SkillDef, int>>(base.Def.skillGains, Util.GetLabel(sd), d => d[sd], (d, i) => d[sd] = i);
 		}
 
-		private IntInputWidget<TraitEntry> CreateTraitEntryInput(TraitEntry te)
+		private IntInputWidget<BackstoryTrait> CreateBackstoryTraitInput(BackstoryTrait te)
 		{
-			var input = new IntInputWidget<TraitEntry>(te, Util.GetLabel(te.def) + " (Degree)", d => d.degree, (d, i) => d.degree = i);
+			var input = new IntInputWidget<BackstoryTrait>(te, Util.GetLabel(te.def) + " (Degree)", d => d.degree, (d, i) => d.degree = i);
 			StringBuilder sb = new StringBuilder(Util.GetLabel(te.def));
 			sb.AppendLine();
 			sb.AppendLine("Degrees:");

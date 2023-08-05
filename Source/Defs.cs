@@ -21,7 +21,7 @@ namespace InGameDefEditor
 		public static readonly SortedDictionary<string, HediffDef> HediffDefs = new SortedDictionary<string, HediffDef>();
 		public static readonly SortedDictionary<string, ThingDef> IngestibleDefs = new SortedDictionary<string, ThingDef>();
 		public static readonly SortedDictionary<string, ThingDef> MineableDefs = new SortedDictionary<string, ThingDef>();
-		public static readonly SortedDictionary<string, Backstory> Backstories = new SortedDictionary<string, Backstory>();
+		public static readonly SortedDictionary<string, BackstoryDef> BackstoryDefs = new SortedDictionary<string, BackstoryDef>();
 		public static readonly SortedDictionary<string, ThingDef> BuildingDefs = new SortedDictionary<string, ThingDef>();
 		public static readonly SortedDictionary<string, ThingDef> ResourceDefs = new SortedDictionary<string, ThingDef>();
 		//public static readonly SortedDictionary<string, ThingDef> AnimalDefs = new SortedDictionary<string, ThingDef>();
@@ -129,8 +129,8 @@ namespace InGameDefEditor
 				foreach (var d in DefDatabase<PawnKindDef>.AllDefs)
 					PawnKindDefs[Util.GetLabel(d)] = d;
 
-				foreach (var b in BackstoryDatabase.allBackstories.Values)
-					Backstories[b.title] = b;
+				foreach (var d in DefDatabase<BackstoryDef>.AllDefs)
+					BackstoryDefs[Util.GetLabel(d)] = d;
 
 				if (i > 0)
                 {

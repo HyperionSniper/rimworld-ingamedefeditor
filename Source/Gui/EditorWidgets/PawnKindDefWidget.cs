@@ -28,7 +28,7 @@ namespace InGameDefEditor.Gui.EditorWidgets
 				new BoolInputWidget<PawnKindDef>(base.Def, "Can Arrive Manhunter", d => d.canArriveManhunter, (d, v) => d.canArriveManhunter = v),
 				new BoolInputWidget<PawnKindDef>(base.Def, "Can Be Sapper", d => d.canBeSapper, (d, v) => d.canBeSapper = v),
 				new BoolInputWidget<PawnKindDef>(base.Def, "Is Good Breacher", d => d.isGoodBreacher, (d, v) => d.isGoodBreacher = v),
-				new FloatInputWidget<PawnKindDef>(base.Def, "Base Recruit Difficulty", d => d.baseRecruitDifficulty, (d, v) => d.baseRecruitDifficulty = v),
+				//new FloatInputWidget<PawnKindDef>(base.Def, "Base Recruit Difficulty", d => d.baseRecruitDifficulty, (d, v) => d.baseRecruitDifficulty = v),
 				new BoolInputWidget<PawnKindDef>(base.Def, "AI Avoid Cover", d => d.aiAvoidCover, (d, v) => d.aiAvoidCover = v),
 				new FloatInputWidget<PawnKindDef>(base.Def, "Accept Arrest Chance Factor", d => d.acceptArrestChanceFactor, (d, v) => d.acceptArrestChanceFactor = v),
 				new FloatInputWidget<PawnKindDef>(base.Def, "apparelAllowHeadgearChance", d => d.apparelAllowHeadgearChance, (d, v) => d.apparelAllowHeadgearChance = v),
